@@ -2,7 +2,7 @@ package gocast
 
 import (
 	"encoding/binary"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 )
 
@@ -34,7 +34,7 @@ func (w *packetStream) readPackets() {
 
 			err := binary.Read(w.stream, binary.BigEndian, &length)
 			if err != nil {
-				fmt.Printf("Failed binary.Read packet: %s", err)
+				log.Warnf("Failed binary.Read packet: %s", err)
 				w.packets <- packetContainer{err: err, payload: nil}
 				return
 			}
@@ -46,12 +46,12 @@ func (w *packetStream) readPackets() {
 
 				i, err := w.stream.Read(packet)
 				if err != nil {
-					fmt.Printf("Failed to read packet: %s", err)
+					log.Warnf("Failed to read packet: %s", err)
 					continue
 				}
 
 				if i != int(length) {
-					fmt.Printf("Invalid packet size. Wanted: %d Read: %d", length, i)
+					log.Warnf("Invalid packet size. Wanted: %d Read: %d", length, i)
 					continue
 				}
 
@@ -78,7 +78,7 @@ func (w *packetStream) Write(data []byte) (int, error) {
 	err := binary.Write(w.stream, binary.BigEndian, uint32(len(data)))
 
 	if err != nil {
-		err = fmt.Errorf("Failed to write packet length %d. error:%s\n", len(data), err)
+		err = log.Errorf("Failed to write packet length %d. error:%s\n", len(data), err)
 		return 0, err
 	}
 

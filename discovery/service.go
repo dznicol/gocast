@@ -2,13 +2,13 @@
 package discovery
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/micro/mdns"
+	log "github.com/sirupsen/logrus"
 	"github.com/stampzilla/gocast"
 )
 
@@ -35,7 +35,7 @@ func NewService() *Service {
 func (d *Service) Periodic(interval time.Duration) error {
 
 	if d.stopPeriodic != nil {
-		return fmt.Errorf("Periodic discovery is allready running")
+		return log.Errorf("Periodic discovery is allready running")
 	}
 
 	mdns.Query(&mdns.QueryParam{

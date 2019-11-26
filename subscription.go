@@ -2,7 +2,7 @@ package gocast
 
 import (
 	"crypto/sha256"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"sync/atomic"
 	"time"
 
@@ -53,7 +53,7 @@ func (s *Subscription) Request(payload responses.Payload) (*api.CastMessage, err
 		return reply, nil
 	case <-time.After(time.Second * 10):
 		delete(s.inFlight, requestId)
-		return nil, fmt.Errorf("Timeout sending: %s", spew.Sdump(payload))
+		return nil, log.Errorf("Timeout sending: %s", spew.Sdump(payload))
 	}
 }
 

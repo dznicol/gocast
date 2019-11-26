@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/stampzilla/gocast/events"
 	"github.com/stampzilla/gocast/responses"
@@ -33,7 +33,7 @@ func (m *Media) Unmarshal(message string) {
 	err := json.Unmarshal([]byte(message), response)
 
 	if err != nil {
-		fmt.Printf("Failed to unmarshal status message:%s - %s\n", err, message)
+		log.Warnf("Failed to unmarshal status message:%s - %s\n", err, message)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (c *Media) LoadMedia(media responses.MediaItem, currentTime int, autoplay b
 		CustomData:  customData,
 	})
 	if err != nil {
-		return fmt.Errorf("Failed to send load command: %s", err)
+		return log.Warnf("Failed to send load command: %s", err)
 	}
 	return nil
 }

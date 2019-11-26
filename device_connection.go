@@ -4,8 +4,9 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrusmt"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gogo/protobuf/proto"
@@ -88,7 +89,7 @@ func (d *Device) connect() error {
 	log.Printf("connecting to %s:%d ...", d.ip, d.port)
 
 	if d.conn != nil {
-		return fmt.Errorf("Already connected to: %s (%s:%d)", d.Name(), d.Ip().String(), d.Port())
+		return log.Errorf("Already connected to: %s (%s:%d)", d.Name(), d.Ip().String(), d.Port())
 	}
 
 	var err error
@@ -98,7 +99,7 @@ func (d *Device) connect() error {
 
 	if err != nil {
 		//d.reconnect <- struct{}{}
-		return fmt.Errorf("Failed to connect to Chromecast. Error:%s", err)
+		return log.Errorf("Failed to connect to Chromecast. Error:%s", err)
 	}
 
 	d.Lock()
@@ -139,7 +140,7 @@ func (d *Device) Disconnect() {
 func (d *Device) Send(urn, sourceId, destinationId string, payload responses.Payload) error {
 	payloadJson, err := json.Marshal(payload)
 	if err != nil {
-		fmt.Println("Failed to json.Marshal: ", err)
+		log.Warnf("Failed to json.Marshal: ", err)
 		return err
 	}
 	payloadString := string(payloadJson)
@@ -157,7 +158,7 @@ func (d *Device) Send(urn, sourceId, destinationId string, payload responses.Pay
 
 	data, err := proto.Marshal(message)
 	if err != nil {
-		fmt.Println("Failed to proto.Marshal: ", err)
+		log.Println("Failed to proto.Marshal: ", err)
 		return err
 	}
 
@@ -166,7 +167,7 @@ func (d *Device) Send(urn, sourceId, destinationId string, payload responses.Pay
 	}
 
 	if d.conn == nil {
-		return fmt.Errorf("We are disconnected, cannot send!")
+		return log.Errorf("We are disconnected, cannot send!")
 	}
 
 	_, err = d.wrapper.Write(data)

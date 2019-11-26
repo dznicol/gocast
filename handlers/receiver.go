@@ -2,8 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/stampzilla/gocast/api"
 	"github.com/stampzilla/gocast/events"
@@ -27,18 +26,18 @@ func (r *Receiver) Disconnect() {
 }
 
 func (r *Receiver) Unmarshal(message string) {
-	log.Println("Receiver received: ", message)
+	log.Debugf("Receiver received: ", message)
 
 	response := &responses.ReceiverResponse{}
 	err := json.Unmarshal([]byte(message), response)
 
 	if err != nil {
-		log.Printf("Failed to unmarshal status message:%s - %s\n", err, message)
+		log.Warnf("Failed to unmarshal status message:%s - %s\n", err, message)
 		return
 	}
 
 	if response.Type != responses.TypeStatus { //Probably an error like: {"reason":"CANCELLED","requestId":2,"type":"LAUNCH_ERROR"}
-		log.Println("Type RECEIVER_STATUS expected. Skipping.")
+		log.Debugf("Type RECEIVER_STATUS expected. Skipping.")
 		return
 	}
 
@@ -100,7 +99,7 @@ type LaunchRequest struct {
 	AppId string `json:"appId"`
 }
 
-var ErrAppAlreadyLaunched = fmt.Errorf("App already launched")
+var ErrAppAlreadyLaunched = log.Errorf("App already launched")
 
 func (r *Receiver) LaunchApp(appId string) error {
 	//already launched?

@@ -1,7 +1,7 @@
 package gocast
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"strconv"
 	"sync"
@@ -98,7 +98,7 @@ func (d *Device) Subscribe(urn, destinationId string, handler Handler) {
 	handler.RegisterDispatch(d.Dispatch)
 	handler.Connect()
 
-	log.Println("Subscribing to ", urn, " --- ", destinationId)
+	log.Debugf("Subscribing to ", urn, " --- ", destinationId)
 
 }
 
