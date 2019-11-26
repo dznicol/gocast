@@ -12,12 +12,12 @@ import (
 )
 
 type Subscription struct {
+	requestId     int64
 	Urn           string
 	SourceId      string
 	DestinationId string
 	Handler       Handler
 	Device        *Device
-	requestId     int64
 	inFlight      map[int]chan *api.CastMessage
 }
 
