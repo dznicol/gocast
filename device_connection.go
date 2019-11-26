@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/sirupsen/logrusmt"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gogo/protobuf/proto"
@@ -20,7 +20,7 @@ func (d *Device) reader() {
 		packet, err := d.wrapper.Read()
 
 		if err != nil {
-			log.Println("Error reading from chromecast error:", err, "Packet:", packet)
+			log.Warnf("Error reading from chromecast error:", err, "Packet:", packet)
 			d.Disconnect()
 			//d.reconnect <- struct{}{}
 			return
@@ -54,7 +54,7 @@ func (d *Device) reader() {
 		d.RUnlock()
 
 		if !catched {
-			log.Println("LOST MESSAGE:")
+			log.Warnf("LOST MESSAGE:")
 			spew.Dump(message)
 		}
 	}
@@ -79,14 +79,14 @@ func (d *Device) reconnector() {
 	for {
 		select {
 		case <-d.reconnect:
-			log.Println("Reconnect signal received")
+			log.Tracef("Reconnect signal received")
 			time.Sleep(time.Second * 2)
 			d.connect()
 		}
 	}
 }
 func (d *Device) connect() error {
-	log.Printf("connecting to %s:%d ...", d.ip, d.port)
+	log.Tracef("connecting to %s:%d ...", d.ip, d.port)
 
 	if d.conn != nil {
 		return log.Errorf("Already connected to: %s (%s:%d)", d.Name(), d.Ip().String(), d.Port())
@@ -158,12 +158,12 @@ func (d *Device) Send(urn, sourceId, destinationId string, payload responses.Pay
 
 	data, err := proto.Marshal(message)
 	if err != nil {
-		log.Println("Failed to proto.Marshal: ", err)
+		log.Warnln("Failed to proto.Marshal: ", err)
 		return err
 	}
 
 	if *message.Namespace != "urn:x-cast:com.google.cast.tp.heartbeat" {
-		log.Println("Writing:", spew.Sdump(message))
+		log.Traceln("Writing:", spew.Sdump(message))
 	}
 
 	if d.conn == nil {

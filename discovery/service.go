@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/micro/mdns"
-	log "github.com/sirupsen/logrus"
 	"github.com/stampzilla/gocast"
+	log "github.com/sirupsen/logrus"
 )
 
 type Service struct {
